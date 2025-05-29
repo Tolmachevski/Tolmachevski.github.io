@@ -25,14 +25,14 @@
     html { font-size: 16px; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--tg-theme-bg-color, var(--bg)); /* Используем переменную из темы Telegram */
-      color: var(--tg-theme-text-color, var(--text)); /* Используем переменную из темы Telegram */
+      background-color: var(--tg-theme-bg-color, var(--bg));
+      color: var(--tg-theme-text-color, var(--text));
       min-height: 100vh;
       padding: 15px; 
       overscroll-behavior-y: contain; 
     }
     .container {
-      background: var(--tg-theme-secondary-bg-color, var(--white)); /* Цвет фона секции от Telegram */
+      background: var(--tg-theme-secondary-bg-color, var(--white));
       max-width: 800px;
       width: 100%;
       border-radius: var(--radius);
@@ -57,8 +57,8 @@
     input[type="text"], input[type="number"] {
       width: 100%; padding: 0.625rem 0.875rem; font-size: 1rem;
       border: 1px solid var(--tg-theme-hint-color, var(--gray-dark)); 
-      background-color: var(--tg-theme-bg-color, var(--white)); /* Фон инпута */
-      color: var(--tg-theme-text-color, var(--text)); /* Цвет текста в инпуте */
+      background-color: var(--tg-theme-bg-color, var(--white));
+      color: var(--tg-theme-text-color, var(--text));
       border-radius: calc(var(--radius) / 2);
       outline: none; transition: border-color var(--transition), box-shadow var(--transition);
       -webkit-appearance: none; -moz-appearance: none; appearance: none;
@@ -66,14 +66,14 @@
     input:focus { border-color: var(--tg-theme-link-color, var(--primary)); box-shadow: 0 0 0 2px var(--tg-theme-link-color, rgba(79, 70, 229, 0.25)); }
     
     #manualSaveButton {
-      display: none; /* По умолчанию скрыта, показываем только если не WebApp */
+      display: none; 
       margin: 20px auto; padding: 10px 20px; background-color: var(--secondary);
       color: white; border: none; border-radius: var(--radius); cursor: pointer; font-size: 0.9rem;
     }
     #manualSaveButton:hover { background-color: var(--primary); }
     
     .custom-main-button {
-        display: none; /* По умолчанию скрыта, используется только если MainButton не видна */
+        display: none; 
         width: calc(100% - 40px); margin: 20px auto;
         background: linear-gradient(to right, var(--primary), var(--secondary)); color: white;
         font-size: 1rem; font-weight: 600; padding: 0.75rem 1.5rem; border: none;
@@ -82,7 +82,7 @@
     }
     .custom-main-button:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
     .custom-main-button:disabled {
-        background: var(--tg-theme-button-disabled-color, var(--gray-medium)); /* Цвет неактивной кнопки */
+        background: var(--tg-theme-button-disabled-color, var(--gray-medium));
         color: var(--tg-theme-button-disabled-text-color, var(--text-light));
         cursor: not-allowed; transform: none; box-shadow: none;
     }
@@ -106,13 +106,8 @@
         <button type="button" id="customSubmitButton" class="custom-main-button" disabled>Сохранить и отправить данные</button>
     </div>
 
-    <!-- Блок для отображения JSON УДАЛЕН -->
-    <!-- 
-    <div id="savedDataContainer" class="saved-data" style="display: none;">
-      <h2>Сформированные данные (JSON):</h2>
-      <pre id="jsonDataOutput" class="json-output"></pre>
-    </div>
-    -->
+    <!-- Блок для отображения JSON был здесь, теперь он не нужен на странице -->
+
   </div>
 
   <script>
@@ -193,7 +188,7 @@
     function updateMainButtonState() {
         if (!isTgWebApp) return; 
         const currentFormData = getFormDataInternal();
-        const isActive = !!currentFormData; // Кнопка активна, если есть хотя бы одно значение
+        const isActive = !!currentFormData; 
 
         tg.MainButton.setParams({
             is_active: isActive, 
@@ -252,10 +247,6 @@
             alert("Пожалуйста, заполните хотя бы одно поле.");
             return;
         }
-        // Убираем отображение JSON в самой форме
-        // jsonDataOutput.textContent = JSON.stringify(currentFormData, null, 2);
-        // savedDataContainer.style.display = "block";
-
         const jsonData = JSON.stringify(currentFormData, null, 2);
         const blob = new Blob([jsonData], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -274,16 +265,15 @@
         document.body.style.backgroundColor = tg.themeParams.bg_color || 'var(--bg)';
         document.body.style.color = tg.themeParams.text_color || 'var(--text)';
         
-        // Инициализация MainButton
         tg.MainButton.setText("Сохранить и отправить");
-        tg.MainButton.show(); // Явно показываем кнопку
-        updateMainButtonState(); // Устанавливаем начальное состояние (скорее всего, неактивна)
+        tg.MainButton.show(); 
+        updateMainButtonState(); 
         
-        tg.onEvent('mainButtonClicked', () => { // Используем событие вместо прямого onClick
+        tg.onEvent('mainButtonClicked', () => { 
             const currentFormData = getFormDataInternal();
             if (currentFormData) {
                 tg.sendData(JSON.stringify(currentFormData));
-                tg.close(); // Закрываем WebApp после успешной отправки
+                tg.close(); // <-- ЗАКРЫВАЕМ WEВAPP ПОСЛЕ ОТПРАВКИ
             } else { 
                 tg.showAlert("Пожалуйста, заполните хотя бы одно поле, чтобы сохранить данные.");
             }
@@ -291,18 +281,14 @@
         
         if (manualSaveButton) manualSaveButton.style.display = 'none';
 
-        // Логика для кастомной кнопки, если MainButton вдруг не видна
-        // Это больше для подстраховки, обычно MainButton должна быть видна
         if (!tg.MainButton.isVisible && customMainButtonContainer && customSubmitButton) {
              console.log("Telegram MainButton is not visible, showing custom button.");
              customMainButtonContainer.style.display = 'block';
-             updateMainButtonState(); // Обновит состояние кастомной кнопки тоже
+             updateMainButtonState(); 
              customSubmitButton.addEventListener('click', () => {
-                 if (isTgWebApp) tg.MainButton.onClick(); // Пробуем эмулировать клик
+                 if (isTgWebApp) tg.MainButton.onClick(); 
              });
         }
-
-
     } catch (e) {
         console.error("Telegram WebApp API error or not in Telegram context:", e);
         if (manualSaveButton) manualSaveButton.style.display = 'block';
@@ -310,10 +296,27 @@
     }
     
     generateFormFields(); 
-    // Обновляем состояние кнопки еще раз после генерации полей, на всякий случай
     if(isTgWebApp) updateMainButtonState(); 
 
-    // Предзаполнение формы (если данные переданы через start_param)
+    function manualSendDataViaTg() {
+        if (isTgWebApp) tg.MainButton.onClick(); 
+        else manualSaveData();
+    }
+    if (customSubmitButton && !tg.MainButton.isVisible && isTgWebApp) {
+        customSubmitButton.addEventListener('click', manualSendDataViaTg);
+    } else if (customSubmitButton && !isTgWebApp) {
+         customSubmitButton.addEventListener('click', manualSaveData);
+         customMainButtonContainer.style.display = 'block';
+         if(customSubmitButton) customSubmitButton.disabled = true; // Изначально неактивна для отладки
+         // Добавим слушатель и для отладочной кнопки, чтобы она тоже активировалась
+         form.addEventListener('input', () => {
+            if(!isTgWebApp && customSubmitButton) {
+                const formData = getFormDataInternal();
+                customSubmitButton.disabled = !formData;
+            }
+         });
+    }
+
     if (isTgWebApp && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
        try {
            const initialData = JSON.parse(decodeURIComponent(tg.initDataUnsafe.start_param));
