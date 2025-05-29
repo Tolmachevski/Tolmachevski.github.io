@@ -2,89 +2,183 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <title>Лабораторные показатели</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --primary: #4f46e5;
-      --secondary: #7c3aed;
-      --success: #10b981;
-      --danger: #ef4444;
-      --text: #1f2937;
-      --text-light: #6b7280;
-      --bg: #f3f4f6;
-      --white: #ffffff;
-      --gray-light: #f9fafb;
-      --gray-medium: #e5e7eb;
-      --gray-dark: #d1d5db;
-      --radius: 0.75rem;
-      --transition: 0.2s ease;
+      --primary-color: #4f46e5; /* Яркий сине-фиолетовый */
+      --secondary-color: #7c3aed; /* Фиолетовый */
+      --text-color-main: #1f2937; /* Темно-серый для основного текста */
+      --text-color-light: #6b7280; /* Светло-серый для подсказок/лейблов */
+      --bg-color-page: #f3f4f6;    /* Светло-серый фон страницы */
+      --bg-color-container: #ffffff; /* Белый фон контейнера */
+      --border-color: #d1d5db;   /* Серый для границ */
+      --border-radius-main: 0.75rem;
+      --border-radius-input: 0.375rem; /* Чуть меньше для инпутов */
+      --transition-speed: 0.2s;
+      
+      /* Переменные, которые может установить Telegram */
+      --tg-theme-bg-color: var(--bg-color-page);
+      --tg-theme-text-color: var(--text-color-main);
+      --tg-theme-hint-color: var(--text-color-light);
+      --tg-theme-link-color: var(--primary-color);
+      --tg-theme-button-color: var(--primary-color);
+      --tg-theme-button-text-color: #ffffff;
+      --tg-theme-secondary-bg-color: var(--bg-color-container);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--tg-theme-bg-color, var(--bg));
-      color: var(--tg-theme-text-color, var(--text));
+      background-color: var(--tg-theme-bg-color);
+      color: var(--tg-theme-text-color);
       min-height: 100vh;
-      padding: 15px; 
-      overscroll-behavior-y: contain; 
+      /* Убираем padding у body, если container занимает всю ширину и имеет свои отступы */
+      /* padding: 15px;  */
+      display: flex; /* Для центрирования контейнера, если он не на всю ширину */
+      justify-content: center; /* Центрирование контейнера */
+      overscroll-behavior-y: contain;
+      -webkit-tap-highlight-color: transparent; /* Убираем синее выделение при тапе на iOS */
     }
+
     .container {
-      background: var(--tg-theme-secondary-bg-color, var(--white));
-      max-width: 800px;
-      width: 100%;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      margin: 0 auto; 
+      background: var(--tg-theme-secondary-bg-color);
+      max-width: 800px; /* Ограничиваем максимальную ширину */
+      width: 100%;      /* Занимает всю доступную ширину */
+      min-height: 100vh; /* Занимает всю высоту WebApp */
+      /* border-radius: var(--border-radius-main); Убираем радиус, если на всю страницу */
+      /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); Убираем тень, если на всю страницу*/
+      display: flex;
+      flex-direction: column;
     }
+
     .header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: var(--white);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: var(--tg-theme-button-text-color); /* Используем цвет текста кнопки для контраста */
       text-align: center;
-      padding: 20px;
+      padding: 20px 15px; /* Адаптивные отступы */
+      flex-shrink: 0; /* Шапка не должна сжиматься */
     }
-    .header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
-    .header p { font-size: 0.9rem; opacity: 0.9; }
-    form { padding: 20px; }
-    .form-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--tg-theme-hint-color, var(--gray-medium)); }
-    .form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .form-section-title { font-size: 1.1rem; font-weight: 600; color: var(--tg-theme-link-color, var(--primary)); margin-bottom: 15px; }
-    .form-group { margin-bottom: 1rem; }
-    label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--tg-theme-hint-color, var(--text-light)); margin-bottom: 0.375rem; }
-    input[type="text"], input[type="number"] {
-      width: 100%; padding: 0.625rem 0.875rem; font-size: 1rem;
-      border: 1px solid var(--tg-theme-hint-color, var(--gray-dark)); 
-      background-color: var(--tg-theme-bg-color, var(--white));
-      color: var(--tg-theme-text-color, var(--text));
-      border-radius: calc(var(--radius) / 2);
-      outline: none; transition: border-color var(--transition), box-shadow var(--transition);
-      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+
+    .header h1 {
+      font-size: 1.4rem; /* Адаптивный размер шрифта */
+      font-weight: 600;
+      margin-bottom: 0.25rem;
     }
-    input:focus { border-color: var(--tg-theme-link-color, var(--primary)); box-shadow: 0 0 0 2px var(--tg-theme-link-color, rgba(79, 70, 229, 0.25)); }
+
+    .header p {
+      font-size: 0.85rem; /* Адаптивный размер шрифта */
+      opacity: 0.9;
+    }
+
+    form {
+      padding: 20px 15px; /* Адаптивные отступы */
+      flex-grow: 1; /* Форма занимает оставшееся пространство */
+      overflow-y: auto; /* Скролл для формы, если не помещается */
+    }
+
+    .form-section {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--tg-theme-hint-color);
+    }
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .form-section-title {
+        font-size: 1.05rem; /* Адаптивный размер шрифта */
+        font-weight: 600;
+        color: var(--tg-theme-link-color);
+        margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 0.875rem; /* 14px */
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem; /* 13px */
+      font-weight: 500;
+      color: var(--tg-theme-hint-color);
+      margin-bottom: 0.25rem; /* 4px */
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 12px; /* 10px 12px */
+      font-size: 0.9375rem; /* 15px */
+      border: 1px solid var(--tg-theme-hint-color); 
+      background-color: var(--tg-theme-bg-color); 
+      color: var(--tg-theme-text-color); 
+      border-radius: var(--border-radius-input);
+      outline: none;
+      transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+      -webkit-appearance: none; 
+      -moz-appearance: none;
+      appearance: none;
+    }
+
+    input:focus {
+      border-color: var(--tg-theme-link-color);
+      box-shadow: 0 0 0 2px var(--tg-theme-link-color, rgba(79, 70, 229, 0.25));
+    }
     
+    /* Кнопка для отладки вне Telegram */
     #manualSaveButton {
-      display: none; 
-      margin: 20px auto; padding: 10px 20px; background-color: var(--secondary);
-      color: white; border: none; border-radius: var(--radius); cursor: pointer; font-size: 0.9rem;
+      display: none; /* По умолчанию скрыта */
+      margin: 20px 15px; /* Отступы как у формы */
+      padding: 12px 20px;
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius-main);
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-align: center;
     }
-    #manualSaveButton:hover { background-color: var(--primary); }
+    #manualSaveButton:hover {
+        background-color: var(--primary-color);
+    }
     
-    .custom-main-button {
-        display: none; 
-        width: calc(100% - 40px); margin: 20px auto;
-        background: linear-gradient(to right, var(--primary), var(--secondary)); color: white;
-        font-size: 1rem; font-weight: 600; padding: 0.75rem 1.5rem; border: none;
-        border-radius: var(--radius); cursor: pointer; text-align: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: all var(--transition);
+    /* Резервная кнопка, если MainButton не отображается (маловероятно для современных клиентов) */
+    .custom-main-button-container {
+        padding: 0 15px 15px 15px; /* Отступы как у формы, но только снизу и по бокам */
+        flex-shrink: 0; /* Контейнер кнопки не должен сжиматься */
     }
-    .custom-main-button:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+    .custom-main-button {
+        display: block; /* Будет показана через JS, если нужно */
+        width: 100%;
+        background: var(--tg-theme-button-color, var(--primary-color));
+        color: var(--tg-theme-button-text-color, #ffffff);
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 12px 20px;
+        border: none;
+        border-radius: var(--border-radius-main);
+        cursor: pointer;
+        text-align: center;
+        transition: opacity var(--transition-speed);
+    }
     .custom-main-button:disabled {
-        background: var(--tg-theme-button-disabled-color, var(--gray-medium));
-        color: var(--tg-theme-button-disabled-text-color, var(--text-light));
-        cursor: not-allowed; transform: none; box-shadow: none;
+        background: var(--tg-theme-secondary-bg-color, var(--gray-medium)); 
+        color: var(--tg-theme-hint-color, var(--text-light));
+        cursor: not-allowed;
+        opacity: 0.7;
     }
   </style>
 </head>
@@ -100,13 +194,13 @@
       <!-- Динамические поля будут добавлены JS -->
     </form>
     
+    <!-- Кнопка для отладки вне Telegram -->
     <button type="button" id="manualSaveButton" onclick="manualSaveData()">Сохранить и скачать JSON (для отладки)</button>
     
-    <div id="customMainButtonContainer" style="display: none;">
+    <!-- Резервная кнопка, если tg.MainButton не работает -->
+    <div id="customMainButtonContainer" class="custom-main-button-container" style="display: none;">
         <button type="button" id="customSubmitButton" class="custom-main-button" disabled>Сохранить и отправить данные</button>
     </div>
-
-    <!-- Блок для отображения JSON был здесь, теперь он не нужен на странице -->
 
   </div>
 
@@ -176,6 +270,7 @@
                 { key: "esr", name: "СОЭ (по Вестергрену)", unit: "мм/ч", type: "text" },
             ]
         }
+        // Добавьте сюда другие группы, если необходимо (Биохимия, ОАМ)
     ];
 
     const form = document.getElementById("labForm");
@@ -184,16 +279,21 @@
     const customMainButtonContainer = document.getElementById("customMainButtonContainer");
 
     let isTgWebApp = false;
+    let mainButtonHandler = null; // Для удаления обработчика
 
     function updateMainButtonState() {
         if (!isTgWebApp) return; 
         const currentFormData = getFormDataInternal();
         const isActive = !!currentFormData; 
 
-        tg.MainButton.setParams({
-            is_active: isActive, 
-            color: isActive ? (tg.themeParams.button_color || '#2481CC') : (tg.themeParams.secondary_bg_color || '#E0E0E0')
-        });
+        try {
+            tg.MainButton.setParams({
+                is_active: isActive, 
+                color: isActive ? tg.themeParams.button_color : tg.themeParams.secondary_bg_color, // Используем цвета темы
+                text_color: isActive ? tg.themeParams.button_text_color : tg.themeParams.hint_color
+            });
+        } catch(e) { console.error("Error setting MainButton params:", e); }
+
         if (customSubmitButton) customSubmitButton.disabled = !isActive;
     }
     
@@ -241,7 +341,7 @@
         return hasValue ? formData : null;
     }
 
-    function manualSaveData() {
+    function manualSaveDataForDebug() { // Переименовал для ясности
         const currentFormData = getFormDataInternal();
         if (!currentFormData) {
             alert("Пожалуйста, заполните хотя бы одно поле.");
@@ -251,90 +351,104 @@
         const blob = new Blob([jsonData], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = 'analysis_data_manual.json'; 
+        a.href = url; a.download = 'analysis_data_manual_debug.json'; 
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        alert("JSON файл 'analysis_data_manual.json' скачан (для отладки).");
+        alert("JSON файл 'analysis_data_manual_debug.json' скачан (для отладки).");
     }
 
-    try {
-        tg.ready();
-        isTgWebApp = true; 
-        tg.expand();
+    // Основная логика инициализации и обработки
+    function initializeApp() {
+        generateFormFields(); 
 
-        document.body.style.backgroundColor = tg.themeParams.bg_color || 'var(--bg)';
-        document.body.style.color = tg.themeParams.text_color || 'var(--text)';
-        
-        tg.MainButton.setText("Сохранить и отправить");
-        tg.MainButton.show(); 
-        updateMainButtonState(); 
-        
-        tg.onEvent('mainButtonClicked', () => { 
-            const currentFormData = getFormDataInternal();
-            if (currentFormData) {
-                tg.sendData(JSON.stringify(currentFormData));
-                tg.close(); // <-- ЗАКРЫВАЕМ WEВAPP ПОСЛЕ ОТПРАВКИ
-            } else { 
-                tg.showAlert("Пожалуйста, заполните хотя бы одно поле, чтобы сохранить данные.");
-            }
-        });
-        
-        if (manualSaveButton) manualSaveButton.style.display = 'none';
+        try {
+            if (tg && tg.initData !== undefined) {
+                isTgWebApp = true; 
+                console.log("Telegram WebApp context detected.");
+                tg.ready();
+                tg.expand();
 
-        if (!tg.MainButton.isVisible && customMainButtonContainer && customSubmitButton) {
-             console.log("Telegram MainButton is not visible, showing custom button.");
-             customMainButtonContainer.style.display = 'block';
-             updateMainButtonState(); 
-             customSubmitButton.addEventListener('click', () => {
-                 if (isTgWebApp) tg.MainButton.onClick(); 
-             });
-        }
-    } catch (e) {
-        console.error("Telegram WebApp API error or not in Telegram context:", e);
-        if (manualSaveButton) manualSaveButton.style.display = 'block';
-        if (customMainButtonContainer) customMainButtonContainer.style.display = 'none';
-    }
-    
-    generateFormFields(); 
-    if(isTgWebApp) updateMainButtonState(); 
-
-    function manualSendDataViaTg() {
-        if (isTgWebApp) tg.MainButton.onClick(); 
-        else manualSaveData();
-    }
-    if (customSubmitButton && !tg.MainButton.isVisible && isTgWebApp) {
-        customSubmitButton.addEventListener('click', manualSendDataViaTg);
-    } else if (customSubmitButton && !isTgWebApp) {
-         customSubmitButton.addEventListener('click', manualSaveData);
-         customMainButtonContainer.style.display = 'block';
-         if(customSubmitButton) customSubmitButton.disabled = true; // Изначально неактивна для отладки
-         // Добавим слушатель и для отладочной кнопки, чтобы она тоже активировалась
-         form.addEventListener('input', () => {
-            if(!isTgWebApp && customSubmitButton) {
-                const formData = getFormDataInternal();
-                customSubmitButton.disabled = !formData;
-            }
-         });
-    }
-
-    if (isTgWebApp && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-       try {
-           const initialData = JSON.parse(decodeURIComponent(tg.initDataUnsafe.start_param));
-           indicatorGroups.forEach(group => {
-               group.indicators.forEach(({ key }) => {
-                    if (initialData[key] !== undefined) {
-                        const inputElement = document.querySelector(`[name="${key}"]`);
-                        if (inputElement) inputElement.value = initialData[key];
+                // Применяем цвета темы Telegram
+                document.body.style.backgroundColor = tg.themeParams.bg_color || 'var(--bg-color-page)';
+                document.body.style.color = tg.themeParams.text_color || 'var(--text-color-main)';
+                
+                tg.MainButton.setText("Сохранить и отправить");
+                tg.MainButton.show(); 
+                updateMainButtonState(); // Установить начальное состояние кнопки
+                
+                // Удаляем предыдущий обработчик, если он был, чтобы избежать дублирования
+                if (mainButtonHandler && typeof tg.offEvent === 'function') { // Убедимся, что offEvent существует
+                    tg.offEvent('mainButtonClicked', mainButtonHandler);
+                }
+                mainButtonHandler = () => { 
+                    console.log("Telegram MainButton clicked!");
+                    const currentFormData = getFormDataInternal();
+                    console.log("Form data to send:", currentFormData);
+                    if (currentFormData) {
+                        try {
+                            tg.sendData(JSON.stringify(currentFormData));
+                            console.log("Data sent via tg.sendData()");
+                            // tg.close(); // Закрываем WebApp после УСПЕШНОЙ отправки
+                        } catch (e) {
+                            console.error("Error sending data via tg.sendData():", e);
+                            tg.showAlert("Ошибка при отправке данных: " + e.message + ". Попробуйте еще раз.");
+                        }
+                    } else { 
+                        console.log("No data to send. Showing alert.");
+                        tg.showAlert("Пожалуйста, заполните хотя бы одно поле, чтобы сохранить данные.");
                     }
+                };
+                tg.onEvent('mainButtonClicked', mainButtonHandler);
+                
+                // Скрываем кнопку ручного сохранения, если мы в Telegram
+                if (manualSaveButton) manualSaveButton.style.display = 'none';
+                if (customMainButtonContainer) customMainButtonContainer.style.display = 'none';
+
+            } else {
+                console.log("Not in Telegram WebApp context. Manual save button will be shown.");
+                if (manualSaveButton) manualSaveButton.style.display = 'block';
+                if (customMainButtonContainer) customMainButtonContainer.style.display = 'none';
+            }
+        } catch (e) {
+            console.error("Error during Telegram WebApp initialization:", e);
+            if (manualSaveButton) manualSaveButton.style.display = 'block';
+            if (customMainButtonContainer) customMainButtonContainer.style.display = 'none';
+        }
+        
+        // Предзаполнение формы (если данные переданы через start_param)
+        if (isTgWebApp && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+           try {
+               console.log("Start param found:", tg.initDataUnsafe.start_param);
+               const initialData = JSON.parse(decodeURIComponent(tg.initDataUnsafe.start_param));
+               console.log("Parsed initial data for prefill:", initialData);
+               indicatorGroups.forEach(group => {
+                   group.indicators.forEach(({ key }) => {
+                        if (initialData[key] !== undefined) {
+                            const inputElement = document.querySelector(`[name="${key}"]`);
+                            if (inputElement) {
+                                inputElement.value = initialData[key];
+                                console.log(`Prefilled field '${key}' with '${initialData[key]}'`);
+                            }
+                        }
+                   });
                });
-           });
-           updateMainButtonState();
-           tg.MainButton.setText("Обновить и отправить данные");
-       } catch (e) { 
-           console.error("Error parsing start_param:", e); 
-           if(isTgWebApp) tg.showAlert("Не удалось загрузить данные для редактирования: " + e.message);
-       }
+               updateMainButtonState(); // Обновить состояние кнопки после предзаполнения
+               tg.MainButton.setText("Обновить и отправить данные");
+           } catch (e) { 
+               console.error("Error parsing or applying start_param data:", e); 
+               if(isTgWebApp) tg.showAlert("Не удалось загрузить данные для редактирования: " + e.message);
+           }
+        }
+        // Устанавливаем фокус на первое поле ввода, если форма не пуста
+        const firstInput = form.querySelector('input[type="text"], input[type="number"]');
+        if (firstInput) {
+            // firstInput.focus(); // Может быть неудобно на мобильных, если клавиатура сразу выезжает
+        }
     }
+
+    // Запускаем инициализацию после загрузки DOM
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
   </script>
 </body>
 </html>
